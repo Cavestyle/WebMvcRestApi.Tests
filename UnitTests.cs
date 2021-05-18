@@ -25,7 +25,12 @@ namespace WebMvcRestApi.Tests
         {
             // Arrange
             const string url = "https://itunes.apple.com/search?term={artistName}&media=music&entity=album&attribute=artistTerm&limit=200";
-            AlbumModel expected = GetTestAlbumModel();
+            List<Result> results = new List<Result>
+            {
+                new Result { ArtistName = "Bloc Party", CollectionName = "Silent Alarm", ReleaseDate = new DateTime(2005, 02, 02), PrimaryGenreName = "Indie"},
+                new Result { ArtistName = "Bloc Party", CollectionName = "Hymns", ReleaseDate = new DateTime(2016, 01, 29), PrimaryGenreName = "Indie"},
+            };
+            AlbumModel expected = new AlbumModel { ResultCount = 2, Results = results };
 
             Mock<IAppleItunesClient> mockClient = new Mock<IAppleItunesClient>();
             mockClient.Setup(x => x.LoadAlbums(It.IsAny<string>())).ReturnsAsync(expected);
@@ -69,7 +74,12 @@ namespace WebMvcRestApi.Tests
         {
             // Arrange
             const string url = "https://itunes.apple.com/search?term=Bloc+Party&media=music&entity=album&attribute=artistTerm&limit=200";
-            AlbumModel expected = GetTestAlbumModel();
+            List<Result> results = new List<Result>
+            {
+                new Result { ArtistName = "Bloc Party", CollectionName = "Silent Alarm", ReleaseDate = new DateTime(2005, 02, 02), PrimaryGenreName = "Indie"},
+                new Result { ArtistName = "Bloc Party", CollectionName = "Hymns", ReleaseDate = new DateTime(2016, 01, 29), PrimaryGenreName = "Indie"},
+            };
+            AlbumModel expected = new AlbumModel { ResultCount = 2, Results = results };
 
             Mock<HttpMessageHandler> mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected().Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
@@ -86,10 +96,7 @@ namespace WebMvcRestApi.Tests
             // Act
             AlbumModel actual = await appleItunesClient.LoadAlbums(url);
 
-            // Assert
-            mockHandler.Protected().Verify("SendAsync", Times.Exactly(1), ItExpr.Is<HttpRequestMessage>
-                (req => req.Method == HttpMethod.Get && req.RequestUri == new Uri(url)), ItExpr.IsAny<CancellationToken>());
-
+            // Assert         
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -113,16 +120,6 @@ namespace WebMvcRestApi.Tests
 
             // Assert         
             actual.Should().BeNull();
-        }
-
-        public static AlbumModel GetTestAlbumModel()
-        {
-            List<Result> testResults = new List<Result>
-            {
-                new Result { ArtistName = "Bloc Party", CollectionName = "Silent Alarm", ReleaseDate = new DateTime(2005, 02, 02), PrimaryGenreName = "Indie"},
-                new Result { ArtistName = "Bloc Party", CollectionName = "Hymns", ReleaseDate = new DateTime(2016, 01, 29), PrimaryGenreName = "Indie"},
-            };
-            return new AlbumModel { ResultCount = 2, Results = testResults };
-        }
+        }       
     }
 }

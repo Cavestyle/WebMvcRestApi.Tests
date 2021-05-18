@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using Xunit;
 
 namespace WebMvcRestApi.Tests
-{
-    // Spin up a test server of this app using WebApplicationFactory.CreateClient
+{    
     public class IntegrationTests : IClassFixture<WebApplicationFactory<WebMvcRestApi.Startup>>
     {
         private readonly HttpClient _httpClient;
@@ -31,8 +30,7 @@ namespace WebMvcRestApi.Tests
             // Assert                   
             string results = await response.Content.ReadAsStringAsync();
             AlbumModel actual = JsonConvert.DeserializeObject<AlbumModel>(results);
-
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+           
             actual.ResultCount.Should().Be(37);                   
         }
 
@@ -48,8 +46,7 @@ namespace WebMvcRestApi.Tests
             string results = await response.Content.ReadAsStringAsync();
             AlbumModel actual = JsonConvert.DeserializeObject<AlbumModel>(results);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-            actual.Results.Should().BeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);            
         }
     }
 }
